@@ -1,7 +1,10 @@
 package com.edus.config;
 
+import com.edus.interceptor.LoginInterceptor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
@@ -9,7 +12,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * 包含跨域配置、拦截器、过滤器等
  */
 @Configuration
+@RequiredArgsConstructor
 public class GlobalConfig implements WebMvcConfigurer {
+
+    private final LoginInterceptor loginInterceptor;
 
     /**
      * 配置跨域请求
@@ -27,5 +33,25 @@ public class GlobalConfig implements WebMvcConfigurer {
                 .allowCredentials(true)
                 // 预检请求的有效期，单位秒（1小时内不需要再发送预检请求）
                 .maxAge(3600);
+    }
+
+    /**
+     * 注册拦截器
+     */
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(loginInterceptor)
+                .addPathPatterns("/**")  // 拦截所有路径
+                .excludePathPatterns(
+                        "/auth/login",        // 登录接口
+                        "/auth/register",     // 注册接口
+                        "/user/login",        // 登录接口
+                        "/user/register",     // 注册接口
+                        "/error",            // 错误页面
+                        "/swagger-ui/**",    // Swagger文档
+                        "/swagger-resources/**",
+                        "/v3/api-docs/**",
+                        "/webjars/**"
+                );  // 排除登录注册等接口
     }
 }
