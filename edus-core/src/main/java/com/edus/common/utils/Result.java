@@ -69,19 +69,28 @@ public class Result<T> implements Serializable {
     }
 
     /**
-     * 成功返回（带数据）
+     * 成功返回（只有消息）
      */
-    public static <T> Result<T> ok(T data) {
-        return new Result<>(StatusCode.SUCCESS, data);
+    public static Result<Void> ok(String message) {
+        Result<Void> result = new Result<>(StatusCode.SUCCESS);
+        result.setMessage(message);
+        return result;
     }
 
     /**
-     * 成功返回（带数据和自定义消息）
+     * 成功返回（消息和数据）
      */
-    public static <T> Result<T> ok(T data, String message) {
+    public static <T> Result<T> ok(String message, T data) {
         Result<T> result = new Result<>(StatusCode.SUCCESS, data);
         result.setMessage(message);
         return result;
+    }
+
+    /**
+     * 成功返回（只有数据）
+     */
+    public static <T> Result<T> ok(T data) {
+        return new Result<>(StatusCode.SUCCESS, data);
     }
 
     /**
@@ -151,6 +160,30 @@ public class Result<T> implements Serializable {
      */
     public boolean isError() {
         return !isSuccess();
+    }
+
+    /**
+     * 设置数据（支持链式调用）
+     */
+    public Result<T> withData(T data) {
+        this.data = data;
+        return this;
+    }
+
+    /**
+     * 设置消息（支持链式调用）
+     */
+    public Result<T> withMessage(String message) {
+        this.message = message;
+        return this;
+    }
+
+    /**
+     * 设置状态码（支持链式调用）
+     */
+    public Result<T> withCode(int code) {
+        this.code = code;
+        return this;
     }
 
     /**

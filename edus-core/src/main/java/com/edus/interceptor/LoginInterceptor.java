@@ -2,18 +2,16 @@ package com.edus.interceptor;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import com.edus.common.utils.Result;
 import com.edus.common.utils.UserContext;
 import com.edus.common.utils.UserContext.UserDto;
 import com.edus.service.TokenService;
-import com.edus.util.TokenUtil;
+import com.edus.common.utils.TokenUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 登录拦截器
@@ -67,10 +65,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         response.setStatus(401);
         response.setContentType("application/json;charset=UTF-8");
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("code", 401);
-        result.put("message", message);
-
+        Result<Void> result = Result.error(401, message, null);
         response.getWriter().write(JSONUtil.toJsonStr(result));
         return false;
     }

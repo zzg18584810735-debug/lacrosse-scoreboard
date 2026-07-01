@@ -48,10 +48,11 @@ public class GlobalConfig implements WebMvcConfigurer {
                         "/user/login",        // 登录接口
                         "/user/register",     // 注册接口
                         "/error",            // 错误页面
-                        "/swagger-ui/**",    // Swagger文档
-                        "/swagger-resources/**",
-                        "/v3/api-docs/**",
-                        "/webjars/**"
+                        "/favicon.ico",      // 网站图标
+                        "/static/**",        // 静态资源
+                        "/css/**",           // CSS资源
+                        "/js/**",            // JS资源
+                        "/images/**"         // 图片资源
                 );  // 排除登录注册等接口
     }
 }

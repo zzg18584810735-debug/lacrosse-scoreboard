@@ -2,7 +2,7 @@ package com.edus;
 
 import cn.hutool.core.util.StrUtil;
 import com.edus.common.utils.UserContext.UserDto;
-import com.edus.util.TokenUtil;
+import com.edus.common.utils.TokenUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 

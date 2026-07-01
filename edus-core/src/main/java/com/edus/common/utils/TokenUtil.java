@@ -1,4 +1,4 @@
-package com.edus.util;
+package com.edus.common.utils;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;

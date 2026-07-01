@@ -1,7 +1,7 @@
 package com.edus.service;
 
 import com.edus.common.utils.UserContext.UserDto;
-import com.edus.util.TokenUtil;
+import com.edus.common.utils.TokenUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;

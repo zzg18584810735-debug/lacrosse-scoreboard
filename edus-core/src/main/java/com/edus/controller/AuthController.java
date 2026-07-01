@@ -2,8 +2,9 @@ package com.edus.controller;
 
 import com.edus.common.utils.UserContext;
 import com.edus.common.utils.UserContext.UserDto;
+import com.edus.common.utils.Result;
 import com.edus.service.TokenService;
-import com.edus.util.TokenUtil;
+import com.edus.common.utils.TokenUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +26,7 @@ public class AuthController {
      * 用户登录
      */
     @PostMapping("/login")
-    public Map<String, Object> login(@RequestBody Map<String, String> params) {
+    public Result<Map<String, Object>> login(@RequestBody Map<String, String> params) {
         String username = params.get("username");
         String password = params.get("password");
 
@@ -42,20 +43,15 @@ public class AuthController {
             // 存储token到Redis
             tokenService.saveToken(userId, token);
 
-            Map<String, Object> result = new HashMap<>();
-            result.put("code", 200);
-            result.put("message", "登录成功");
-            result.put("token", token);
-            result.put("userId", userId);
-            result.put("username", username);
+            Map<String, Object> data = new HashMap<>();
+            data.put("token", token);
+            data.put("userId", userId);
+            data.put("username", username);
 
-            return result;
+            return Result.ok("登录成功", data);
         }
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("code", 400);
-        result.put("message", "用户名或密码错误");
-        return result;
+        return Result.error("用户名或密码错误");
     }
 
     /**
@@ -63,35 +59,29 @@ public class AuthController {
      * 需要token认证
      */
     @GetMapping("/userInfo")
-    public Map<String, Object> getUserInfo() {
+    public Result<Map<String, Object>> getUserInfo() {
         UserDto userDto = UserContext.get();
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("code", 200);
-        result.put("message", "获取用户信息成功");
-
         if (userDto != null) {
-            result.put("userId", userDto.getId());
-            result.put("username", userDto.getName());
+            Map<String, Object> data = new HashMap<>();
+            data.put("userId", userDto.getId());
+            data.put("username", userDto.getName());
+            return Result.ok("获取用户信息成功", data);
         }
 
-        return result;
+        return Result.error("获取用户信息失败");
     }
 
     /**
      * 退出登录
      */
     @PostMapping("/logout")
-    public Map<String, Object> logout() {
+    public Result<Void> logout() {
         UserDto userDto = UserContext.get();
         if (userDto != null) {
             tokenService.removeToken(userDto.getId());
         }
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("code", 200);
-        result.put("message", "退出登录成功");
-
-        return result;
+        return Result.ok("退出登录成功");
     }
 }
