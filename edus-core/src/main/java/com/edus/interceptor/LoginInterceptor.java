@@ -53,7 +53,7 @@ public class LoginInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
         // 请求完成后清理ThreadLocal，防止内存泄漏
         UserContext.remove();
     }
@@ -65,7 +65,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         response.setStatus(401);
         response.setContentType("application/json;charset=UTF-8");
 
-        Result<Void> result = Result.error(401, message, null);
+        Result<Void> result = Result.error(401, message);
         response.getWriter().write(JSONUtil.toJsonStr(result));
         return false;
     }

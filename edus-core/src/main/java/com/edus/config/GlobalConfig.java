@@ -43,6 +43,7 @@ public class GlobalConfig implements WebMvcConfigurer {
         registry.addInterceptor(loginInterceptor)
                 .addPathPatterns("/**")  // 拦截所有路径
                 .excludePathPatterns(
+                        "/test/**",
                         "/auth/login",        // 登录接口
                         "/auth/register",     // 注册接口
                         "/user/login",        // 登录接口

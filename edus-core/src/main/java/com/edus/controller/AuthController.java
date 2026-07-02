@@ -1,5 +1,6 @@
 package com.edus.controller;
 
+import com.edus.annotation.LogOperation;
 import com.edus.common.utils.UserContext;
 import com.edus.common.utils.UserContext.UserDto;
 import com.edus.common.utils.Result;
@@ -26,6 +27,13 @@ public class AuthController {
      * 用户登录
      */
     @PostMapping("/login")
+    @LogOperation(
+            operationType = "LOGIN",
+            module = "登录",
+            description = "登录",
+            logParams = false,
+            logResponse = true
+    )
     public Result<Map<String, Object>> login(@RequestBody Map<String, String> params) {
         String username = params.get("username");
         String password = params.get("password");

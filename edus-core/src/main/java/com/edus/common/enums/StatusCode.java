@@ -16,11 +16,6 @@ public enum StatusCode {
     SUCCESS(200, "操作成功"),
 
     /**
-     * 创建成功
-     */
-    CREATED(201, "创建成功"),
-
-    /**
      * 请求失败
      */
     BAD_REQUEST(400, "请求参数错误"),

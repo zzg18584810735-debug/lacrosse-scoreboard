@@ -1,0 +1,22 @@
+spring:
+  # 数据库配置 - 生产环境
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:edus_prod}?useUnicode=true&characterEncoding=utf8&useSSL=true&serverTimezone=UTC
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:prod_password}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  # Redis配置 - 生产环境
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:prod_password}
+      database: ${REDIS_DB:9}
+      timeout: 3000
+      lettuce:
+        pool:
+          max-active: 50
+          max-wait: -1
+          max-idle: 20
+          min-idle: 5
