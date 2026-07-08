@@ -20,3 +20,10 @@ spring:
           max-wait: -1
           max-idle: 10
           min-idle: 2
+
+edus:
+  sign:
+    enabled: ${EDUS_SIGN_ENABLED:true}
+    app-id: ${EDUS_SIGN_APP_ID:edus-test-open-api}
+    secret: ${EDUS_SIGN_SECRET:edus-test-sign-secret}
+    timestamp-expire-seconds: ${EDUS_SIGN_EXPIRE_SECONDS:300}

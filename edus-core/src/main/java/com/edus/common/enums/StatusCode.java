@@ -26,6 +26,21 @@ public enum StatusCode {
     UNAUTHORIZED(401, "未授权，请先登录"),
 
     /**
+     * 未登录或token已过期
+     */
+    LOGIN_EXPIRED(401, "未登录或token已过期"),
+
+    /**
+     * token验证失败
+     */
+    TOKEN_INVALID(401, "token验证失败"),
+
+    /**
+     * 签名验证失败
+     */
+    SIGNATURE_INVALID(401, "签名验证失败"),
+
+    /**
      * 禁止访问
      */
     FORBIDDEN(403, "禁止访问"),
