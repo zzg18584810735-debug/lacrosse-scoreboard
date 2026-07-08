@@ -31,8 +31,6 @@ public class TokenUtil {
         }
 
         Map<String, Object> payload = new HashMap<>();
-        payload.put("userId", userDto.getId());
-        payload.put("username", userDto.getName());
         payload.put("userDto", JSONUtil.toJsonStr(userDto));
         payload.put("expireTime", System.currentTimeMillis() + EXPIRE_TIME * 1000);
 

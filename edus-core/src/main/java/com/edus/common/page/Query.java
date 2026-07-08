@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -13,6 +14,10 @@ import java.util.Map;
  * @author edus
  */
 public class Query<T> {
+
+    private static final long DEFAULT_PAGE = 1L;
+    private static final long DEFAULT_LIMIT = 20L;
+    private static final long MAX_LIMIT = 1000L;
 
     /**
      * 获取分页对象 - 简单版本（无排序）
@@ -29,6 +34,10 @@ public class Query<T> {
      */
     @SafeVarargs
     public final IPage<T> getPage(Map<String, Object> params, OrderItem... orderItems) {
+        if (params == null) {
+            params = new HashMap<>();
+        }
+
         // 解析分页参数
         long curPage = getCurPage(params);
         long limit = getLimit(params);
@@ -47,20 +56,35 @@ public class Query<T> {
      * 解析当前页码
      */
     private long getCurPage(Map<String, Object> params) {
-        if(params.get(Constant.PAGE) != null){
-            return Long.parseLong(StrUtil.toString(params.get(Constant.PAGE)));
-        }
-        return 1;
+        return parsePositiveLong(params.get(Constant.PAGE), DEFAULT_PAGE, Long.MAX_VALUE);
     }
 
     /**
      * 解析每页大小
      */
     private long getLimit(Map<String, Object> params) {
-        if(params.get(Constant.LIMIT) != null){
-            return Long.parseLong(StrUtil.toString(params.get(Constant.LIMIT)));
+        return parsePositiveLong(params.get(Constant.LIMIT), DEFAULT_LIMIT, MAX_LIMIT);
+    }
+
+    private long parsePositiveLong(Object value, long defaultValue, long maxValue) {
+        if (value == null) {
+            return defaultValue;
         }
-        return 20;
+
+        String text = StrUtil.toString(value).trim();
+        if (StrUtil.isBlank(text)) {
+            return defaultValue;
+        }
+
+        try {
+            long parsed = Long.parseLong(text);
+            if (parsed <= 0) {
+                return defaultValue;
+            }
+            return Math.min(parsed, maxValue);
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
     }
 
     /**

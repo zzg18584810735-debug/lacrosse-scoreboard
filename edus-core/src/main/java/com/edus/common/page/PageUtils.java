@@ -2,6 +2,7 @@ package com.edus.common.page;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -9,29 +10,29 @@ import java.util.List;
  *
  * @author edus
  */
-public class PageUtils implements Serializable {
+public class PageUtils<T> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
      * 总记录数
      */
-    private int totalCount;
+    private long totalCount;
     /**
      * 每页记录数
      */
-    private int pageSize;
+    private long pageSize;
     /**
      * 总页数
      */
-    private int totalPage;
+    private long totalPage;
     /**
      * 当前页数
      */
-    private int currPage;
+    private long currPage;
     /**
      * 列表数据
      */
-    private List<?> list;
+    private List<T> list;
 
     /**
      * 分页
@@ -40,62 +41,74 @@ public class PageUtils implements Serializable {
      * @param pageSize    每页记录数
      * @param currPage    当前页数
      */
-    public PageUtils(List<?> list, int totalCount, int pageSize, int currPage) {
-        this.list = list;
+    public PageUtils(List<T> list, long totalCount, long pageSize, long currPage) {
+        this.list = list == null ? Collections.emptyList() : list;
         this.totalCount = totalCount;
         this.pageSize = pageSize;
         this.currPage = currPage;
-        this.totalPage = (int)Math.ceil((double)totalCount/pageSize);
+        this.totalPage = calculateTotalPage(totalCount, pageSize);
     }
 
     /**
      * 分页 - 从 MyBatis-Plus 的 IPage 对象转换
      */
-    public PageUtils(IPage<?> page) {
-        this.list = page.getRecords();
-        this.totalCount = (int)page.getTotal();
-        this.pageSize = (int)page.getSize();
-        this.currPage = (int)page.getCurrent();
-        this.totalPage = (int)page.getPages();
+    public PageUtils(IPage<T> page) {
+        if (page == null) {
+            this.list = Collections.emptyList();
+            return;
+        }
+
+        this.list = page.getRecords() == null ? Collections.emptyList() : page.getRecords();
+        this.totalCount = page.getTotal();
+        this.pageSize = page.getSize();
+        this.currPage = page.getCurrent();
+        this.totalPage = page.getPages();
     }
 
-    public int getTotalCount() {
+    private long calculateTotalPage(long totalCount, long pageSize) {
+        if (totalCount <= 0 || pageSize <= 0) {
+            return 0;
+        }
+        return (totalCount + pageSize - 1) / pageSize;
+    }
+
+    public long getTotalCount() {
         return totalCount;
     }
 
-    public void setTotalCount(int totalCount) {
+    public void setTotalCount(long totalCount) {
         this.totalCount = totalCount;
     }
 
-    public int getPageSize() {
+    public long getPageSize() {
         return pageSize;
     }
 
-    public void setPageSize(int pageSize) {
+    public void setPageSize(long pageSize) {
         this.pageSize = pageSize;
     }
 
-    public int getTotalPage() {
+    public long getTotalPage() {
         return totalPage;
     }
 
-    public void setTotalPage(int totalPage) {
+    public void setTotalPage(long totalPage) {
         this.totalPage = totalPage;
     }
 
-    public int getCurrPage() {
+    public long getCurrPage() {
         return currPage;
     }
 
-    public void setCurrPage(int currPage) {
+    public void setCurrPage(long currPage) {
         this.currPage = currPage;
     }
 
-    public List<?> getList() {
+    public List<T> getList() {
         return list;
     }
 
-    public void setList(List<?> list) {
-        this.list = list;
+    public void setList(List<T> list) {
+        this.list = list == null ? Collections.emptyList() : list;
     }
 }
