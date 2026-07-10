@@ -1,6 +1,5 @@
-package com.edus.controller;
+package com.edus.controller.example;
 
-import com.edus.annotation.LogOperation;
 import com.edus.common.utils.Result;
 import com.edus.entity.OperationLog;
 import com.edus.service.OperationLogService;

@@ -10,12 +10,14 @@ import org.apache.ibatis.session.RowBounds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Properties;
 
 /**
  * SQL执行拦截器 - 用于监控SQL执行情况
+ * 支持慢SQL检测、性能统计和异常监控
  */
 @Component
 @Intercepts({
@@ -29,8 +31,9 @@ public class SqlInterceptor implements Interceptor {
     @Autowired
     private SqlPerformanceMonitor sqlPerformanceMonitor;
 
-    // 慢SQL阈值（毫秒）
-    private static final long SLOW_SQL_THRESHOLD = 1000L;
+    // 慢SQL阈值（毫秒） - 可通过配置文件配置
+    @Value("${edus.performance.monitoring.slow-sql-threshold:1000}")
+    private long slowSqlThreshold;
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
@@ -82,7 +85,7 @@ public class SqlInterceptor implements Interceptor {
         logMessage.append("耗时: ").append(executionTime).append("ms, ");
         logMessage.append("状态: ").append(success ? "成功" : "失败");
 
-        if (executionTime > SLOW_SQL_THRESHOLD) {
+        if (executionTime > slowSqlThreshold) {
             logger.warn("⚠️ 慢SQL检测 - {}", logMessage);
         } else {
             logger.debug("✅ {}", logMessage);
@@ -96,6 +99,14 @@ public class SqlInterceptor implements Interceptor {
 
     @Override
     public void setProperties(Properties properties) {
-        // 可以在这里设置拦截器属性
+        // 可以通过属性配置拦截器
+        String threshold = properties.getProperty("slowSqlThreshold");
+        if (threshold != null) {
+            this.slowSqlThreshold = Long.parseLong(threshold);
+        }
+    }
+
+    public void setSlowSqlThreshold(long slowSqlThreshold) {
+        this.slowSqlThreshold = slowSqlThreshold;
     }
 }

@@ -4,7 +4,7 @@ import com.edus.annotation.LogOperation;
 import com.edus.common.utils.UserContext;
 import com.edus.common.utils.UserContext.UserDto;
 import com.edus.common.utils.Result;
-import com.edus.service.TokenService;
+import com.edus.service.auth.TokenService;
 import com.edus.common.utils.TokenUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

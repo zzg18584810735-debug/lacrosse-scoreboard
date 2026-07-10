@@ -1,29 +1,43 @@
+# 生产环境配置
+
 spring:
   # 数据库配置 - 生产环境
   datasource:
     url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:edus_prod}?useUnicode=true&characterEncoding=utf8&useSSL=true&serverTimezone=UTC
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:prod_password}
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      # 生产环境特定配置
+      maximum-pool-size: 50              # 生产环境需要更多连接
+      minimum-idle: 10                    # 保持更多空闲连接
+      pool-name: EdusProdHikariCP
 
-  # Redis配置 - 生产环境
   data:
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:prod_password}
       database: ${REDIS_DB:9}
-      timeout: 3000
       lettuce:
         pool:
-          max-active: 50
-          max-wait: -1
+          max-active: 50                 # 生产环境Redis连接池
           max-idle: 20
           min-idle: 5
 
 edus:
+  # 签名配置 - 生产环境
   sign:
     enabled: ${EDUS_SIGN_ENABLED:true}
     app-id: ${EDUS_SIGN_APP_ID:edus-prod-open-api}
     secret: ${EDUS_SIGN_SECRET:change-me-prod-sign-secret}
     timestamp-expire-seconds: ${EDUS_SIGN_EXPIRE_SECONDS:300}
+
+  # 异步任务配置 - 生产环境
+  async:
+    timeout-warning-millis: ${EDUS_ASYNC_TIMEOUT_WARNING_MILLIS:30000}
+
+  # 监控接口保护 - 生产环境
+  monitor:
+    access-token: ${EDUS_MONITOR_ACCESS_TOKEN:}
+    allow-dev-profile: false
+    allow-internal-network: ${EDUS_MONITOR_ALLOW_INTERNAL_NETWORK:true}

@@ -1,20 +1,20 @@
-package com.edus.service;
+package com.edus.service.auth;
 
 import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.digest.HMac;
 import cn.hutool.crypto.digest.HmacAlgorithm;
+import com.edus.common.components.CacheManager;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.security.MessageDigest;
 import java.time.Instant;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 请求签名服务，用于在没有登录 token 的情况下访问接口。
@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class SignatureService {
 
     public static final String HEADER_APP_ID = "X-Sign-AppId";
@@ -32,7 +33,7 @@ public class SignatureService {
 
     private static final String NONCE_KEY_PREFIX = "request:sign:nonce:";
 
-    private final StringRedisTemplate stringRedisTemplate;
+    private final CacheManager cacheManager;
 
     @Value("${edus.sign.enabled:true}")
     private boolean enabled;
@@ -45,10 +46,6 @@ public class SignatureService {
 
     @Value("${edus.sign.timestamp-expire-seconds:300}")
     private long timestampExpireSeconds;
-
-    public SignatureService(StringRedisTemplate stringRedisTemplate) {
-        this.stringRedisTemplate = stringRedisTemplate;
-    }
 
     /**
      * 判断请求是否带了签名相关请求头。
@@ -159,14 +156,8 @@ public class SignatureService {
      * 在有效期内被重复使用，需要拒绝。</p>
      */
     private boolean markNonce(String appId, String nonce) {
-        try {
-            String key = NONCE_KEY_PREFIX + appId + ":" + nonce;
-            return Boolean.TRUE.equals(stringRedisTemplate.opsForValue()
-                    .setIfAbsent(key, "1", timestampExpireSeconds, TimeUnit.SECONDS));
-        } catch (Exception e) {
-            log.warn("Request signature nonce check failed", e);
-            return false;
-        }
+        String key = NONCE_KEY_PREFIX + appId + ":" + nonce;
+        return cacheManager.setIfAbsent(key, "1", timestampExpireSeconds);
     }
 
     /**

@@ -4,6 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.edus.annotation.LogOperation;
 import com.edus.common.utils.UserContext;
+import com.edus.common.utils.WebUtils;
 import com.edus.entity.OperationLog;
 import com.edus.service.OperationLogService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -61,7 +62,7 @@ public class OperationLogAspect {
                 operationLog.setDescription(annotation.description());
                 operationLog.setRequestMethod(request.getMethod());
                 operationLog.setRequestUrl(request.getRequestURI());
-                operationLog.setIpAddress(getClientIP(request));
+                operationLog.setIpAddress(WebUtils.getClientIP(request));
                 operationLog.setUserAgent(request.getHeader("User-Agent"));
 
                 // 设置用户信息
@@ -114,32 +115,5 @@ public class OperationLogAspect {
                 log.error("操作日志保存失败", e);
             }
         }
-    }
-
-    /**
-     * 获取客户端IP地址
-     */
-    private String getClientIP(HttpServletRequest request) {
-        String ip = request.getHeader("X-Forwarded-For");
-        if (StrUtil.isBlank(ip) || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("Proxy-Client-IP");
-        }
-        if (StrUtil.isBlank(ip) || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
-        }
-        if (StrUtil.isBlank(ip) || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("HTTP_CLIENT_IP");
-        }
-        if (StrUtil.isBlank(ip) || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("HTTP_X_FORWARDED_FOR");
-        }
-        if (StrUtil.isBlank(ip) || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
-        }
-        // 处理多个IP的情况，取第一个
-        if (StrUtil.isNotBlank(ip) && ip.contains(",")) {
-            ip = ip.split(",")[0].trim();
-        }
-        return ip;
     }
 }

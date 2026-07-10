@@ -44,7 +44,6 @@ public class TokenUtil {
         if (StrUtil.isBlank(token)) {
             return false;
         }
-
         try {
             // 去除Bearer前缀
             if (token.startsWith(TOKEN_PREFIX)) {

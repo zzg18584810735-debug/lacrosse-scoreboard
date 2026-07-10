@@ -1,14 +1,16 @@
 package com.edus.config;
 
+import com.edus.monitor.AsyncTaskMonitor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.TaskDecorator;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
@@ -21,6 +23,15 @@ import java.util.concurrent.ThreadPoolExecutor;
 @EnableAsync
 public class AsyncConfig implements AsyncConfigurer {
 
+    private final AsyncTaskMonitor asyncTaskMonitor;
+
+    @Value("${edus.async.timeout-warning-millis:30000}")
+    private long timeoutWarningMillis;
+
+    public AsyncConfig(AsyncTaskMonitor asyncTaskMonitor) {
+        this.asyncTaskMonitor = asyncTaskMonitor;
+    }
+
     /**
      * 默认异步任务线程池
      * 核心线程数：5
@@ -29,7 +40,7 @@ public class AsyncConfig implements AsyncConfigurer {
      */
     @Bean(name = "taskExecutor")
     @Override
-    public Executor getAsyncExecutor() {
+    public ThreadPoolTaskExecutor getAsyncExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
 
         // 核心线程数
@@ -49,6 +60,9 @@ public class AsyncConfig implements AsyncConfigurer {
 
         // 拒绝策略：由调用线程处理
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+
+        // 记录任务执行状态、耗时和超时告警
+        executor.setTaskDecorator(asyncTaskDecorator());
 
         // 等待所有任务完成后再关闭线程池
         executor.setWaitForTasksToCompleteOnShutdown(true);
@@ -71,5 +85,27 @@ public class AsyncConfig implements AsyncConfigurer {
     public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
         return (throwable, method, params) -> log.error("异步任务执行异常 - 方法: {}, 参数: {}, 异常: {}",
                 method.getName(), params, throwable.getMessage(), throwable);
+    }
+
+    private TaskDecorator asyncTaskDecorator() {
+        return runnable -> () -> {
+            long startTime = System.currentTimeMillis();
+            asyncTaskMonitor.recordStart();
+            try {
+                runnable.run();
+                long executionTime = System.currentTimeMillis() - startTime;
+                asyncTaskMonitor.recordSuccess(executionTime, timeoutWarningMillis);
+                if (timeoutWarningMillis > 0 && executionTime > timeoutWarningMillis) {
+                    log.warn("异步任务执行超时告警：thread={}, executionTime={}ms, threshold={}ms",
+                            Thread.currentThread().getName(), executionTime, timeoutWarningMillis);
+                }
+            } catch (Throwable throwable) {
+                long executionTime = System.currentTimeMillis() - startTime;
+                asyncTaskMonitor.recordFailure(executionTime, timeoutWarningMillis);
+                throw throwable;
+            } finally {
+                asyncTaskMonitor.recordFinish();
+            }
+        };
     }
 }

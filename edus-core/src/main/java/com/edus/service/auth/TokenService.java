@@ -1,12 +1,10 @@
-package com.edus.service;
+package com.edus.service.auth;
 
+import com.edus.common.components.CacheManager;
 import com.edus.common.utils.UserContext.UserDto;
 import com.edus.common.utils.TokenUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * Token服务
@@ -16,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class TokenService {
 
-    private final StringRedisTemplate stringRedisTemplate;
+    private final CacheManager cacheManager;
 
     private static final String REDIS_KEY_PREFIX = "token:";
     private static final long EXPIRE_TIME = 7 * 24 * 60 * 60; // 7天
@@ -25,16 +23,16 @@ public class TokenService {
      * 存储token到redis
      */
     public void saveToken(String userId, String token) {
-        String redisKey = REDIS_KEY_PREFIX + userId;
-        stringRedisTemplate.opsForValue().set(redisKey, token, EXPIRE_TIME, TimeUnit.SECONDS);
+        String key = REDIS_KEY_PREFIX + userId;
+        cacheManager.set(key, token, EXPIRE_TIME);
     }
 
     /**
      * 从redis获取token
      */
     public String getToken(String userId) {
-        String redisKey = REDIS_KEY_PREFIX + userId;
-        return stringRedisTemplate.opsForValue().get(redisKey);
+        String key = REDIS_KEY_PREFIX + userId;
+        return cacheManager.get(key);
     }
 
     /**
@@ -85,15 +83,15 @@ public class TokenService {
      * 删除token
      */
     public void removeToken(String userId) {
-        String redisKey = REDIS_KEY_PREFIX + userId;
-        stringRedisTemplate.delete(redisKey);
+        String key = REDIS_KEY_PREFIX + userId;
+        cacheManager.delete(key);
     }
 
     /**
      * 刷新token过期时间
      */
     public boolean refreshExpire(String userId) {
-        String redisKey = REDIS_KEY_PREFIX + userId;
-        return stringRedisTemplate.expire(redisKey, EXPIRE_TIME, TimeUnit.SECONDS);
+        String key = REDIS_KEY_PREFIX + userId;
+        return cacheManager.expire(key, EXPIRE_TIME);
     }
 }

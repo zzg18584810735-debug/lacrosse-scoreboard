@@ -50,7 +50,7 @@ public class GlobalConfig implements WebMvcConfigurer {
                         "/user/register",     // 注册接口
                         "/error",            // 错误页面
                         "/favicon.ico",      // 网站图标
-                        "/static/**",        // 静态资源
+                        "/html/**",        // 静态资源
                         "/css/**",           // CSS资源
                         "/js/**",            // JS资源
                         "/images/**"         // 图片资源

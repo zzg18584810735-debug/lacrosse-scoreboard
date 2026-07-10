@@ -1,29 +1,43 @@
+# 开发环境配置
+
 spring:
   # 数据库配置 - 开发环境
   datasource:
     url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:parent_end}?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:123456}
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      # 开发环境特定配置
+      maximum-pool-size: 10              # 开发环境连接池可以稍小
+      minimum-idle: 2                    # 开发环境最少空闲连接
+      pool-name: EdusDevHikariCP
 
-  # Redis配置 - 开发环境
   data:
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:}
       database: ${REDIS_DB:0}
-      timeout: 3000
       lettuce:
         pool:
-          max-active: 8
-          max-wait: -1
+          max-active: 8                  # 开发环境Redis连接池
           max-idle: 8
           min-idle: 0
 
 edus:
+  # 签名配置 - 开发环境
   sign:
     enabled: ${EDUS_SIGN_ENABLED:true}
     app-id: ${EDUS_SIGN_APP_ID:jx-dev}
     secret: ${EDUS_SIGN_SECRET:edus-dev-sign-secret}
     timestamp-expire-seconds: ${EDUS_SIGN_EXPIRE_SECONDS:300}
+
+  # 异步任务配置 - 开发环境
+  async:
+    timeout-warning-millis: ${EDUS_ASYNC_TIMEOUT_WARNING_MILLIS:30000}
+
+  # 监控接口保护 - 开发环境
+  monitor:
+    access-token: ${EDUS_MONITOR_ACCESS_TOKEN:}
+    allow-dev-profile: true
+    allow-internal-network: true

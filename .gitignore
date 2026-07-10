@@ -1,25 +1,27 @@
-# 环境配置文件（包含敏感信息）
-.env.local
-.env.*.local
+# Environment files with secrets
+.env
+.env.*
+!.env.example
 
-# 日志文件
+# Logs
 logs/
+*.log
 
-# IDE 相关
+# IDE files
 .idea/
+.vscode/
 *.iml
 *.ipr
-.vscode/
 
-# Maven
+# Maven build output
 target/
+**/target/
 !.mvn/wrapper/maven-wrapper.jar
 
-# 操作系统
+# OS files
 .DS_Store
 Thumbs.db
 
-# 临时文件
-*.log
+# Temporary files
 *.tmp
 *.cache
