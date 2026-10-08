@@ -9,7 +9,7 @@ public class PasswordTest {
     @Test
     public void testPasswordEncryption() {
         // 测试原始密码
-        String password = "admin123";
+        String password = "123456";
         System.out.println("原始密码: " + password);
 
         // MD5 加密
@@ -22,7 +22,8 @@ public class PasswordTest {
 
         // BCrypt 加密（推荐用于密码存储）
         String bcrytPassword = BCrypt.hashpw(password, BCrypt.gensalt());
-        System.out.println("BCrypt加密: " + bcrytPassword);
+        String bcrytPassword1 = BCrypt.hashpw("123456", BCrypt.gensalt());
+        System.out.println(bcrytPassword1+ "BCrypt加密: " + bcrytPassword);
 
         // 验证 BCrypt 密码
         boolean isMatch = BCrypt.checkpw(password, bcrytPassword);

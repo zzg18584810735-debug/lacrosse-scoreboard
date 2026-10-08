@@ -3,7 +3,7 @@
 spring:
   # 数据库配置 - 开发环境
   datasource:
-    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:parent_end}?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:demo}?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:123456}
     hikari:
@@ -27,17 +27,13 @@ spring:
 edus:
   # 签名配置 - 开发环境
   sign:
-    enabled: ${EDUS_SIGN_ENABLED:true}
-    app-id: ${EDUS_SIGN_APP_ID:jx-dev}
-    secret: ${EDUS_SIGN_SECRET:edus-dev-sign-secret}
-    timestamp-expire-seconds: ${EDUS_SIGN_EXPIRE_SECONDS:300}
-
-  # 异步任务配置 - 开发环境
-  async:
-    timeout-warning-millis: ${EDUS_ASYNC_TIMEOUT_WARNING_MILLIS:30000}
+    enabled: true
+    app-id: jx-dev
+    secret: edus-dev-sign-secret
+    timestamp-expire-seconds: 300
 
   # 监控接口保护 - 开发环境
   monitor:
-    access-token: ${EDUS_MONITOR_ACCESS_TOKEN:}
+    access-token: edus-dev-monitor-token
     allow-dev-profile: true
     allow-internal-network: true

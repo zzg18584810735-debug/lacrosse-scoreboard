@@ -1,6 +1,6 @@
 package com.edus.controller.example;
 
-import com.edus.annotation.Cache;
+import com.edus.aop.annotation.Cache;
 import com.edus.common.components.CacheManager;
 import com.edus.common.utils.Result;
 import lombok.RequiredArgsConstructor;

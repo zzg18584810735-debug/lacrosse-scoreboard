@@ -1,9 +1,5 @@
 package com.edus.controller;
 
-import cn.hutool.core.util.DesensitizedUtil;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.crypto.digest.DigestUtil;
-import com.edus.common.enums.StatusCode;
 import com.edus.common.page.PageUtils;
 import com.edus.common.utils.Result;
 import com.edus.entity.User;
@@ -11,7 +7,6 @@ import com.edus.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @RestController

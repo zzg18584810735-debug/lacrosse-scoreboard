@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <!-- 日志文件输出路径 -->
-    <property name="LOG_HOME" value="data/logs"/>
-    <property name="APP_NAME" value="edus-server"/>
+    <!-- 从 Spring Boot 配置中读取日志路径 -->
+    <springProperty scope="context" name="LOG_HOME" source="log.path" defaultValue="data/dev/logs"/>
+    <springProperty scope="context" name="APP_NAME" source="log.file.name" defaultValue="edus-dev"/>
 
     <!-- 控制台输出 -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">

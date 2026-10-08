@@ -1,6 +1,6 @@
-package com.edus.aspect;
+package com.edus.aop.aspect;
 
-import com.edus.annotation.Idempotent;
+import com.edus.aop.annotation.Idempotent;
 import com.edus.common.components.CacheManager;
 import com.edus.common.exception.BusinessException;
 import com.edus.common.enums.StatusCode;

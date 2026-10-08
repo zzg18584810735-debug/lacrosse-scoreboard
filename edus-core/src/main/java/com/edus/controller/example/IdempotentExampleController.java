@@ -1,6 +1,6 @@
 package com.edus.controller.example;
 
-import com.edus.annotation.Idempotent;
+import com.edus.aop.annotation.Idempotent;
 import com.edus.common.utils.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;

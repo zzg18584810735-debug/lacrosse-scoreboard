@@ -1,8 +1,9 @@
-package com.edus.aspect;
+package com.edus.aop.aspect;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
-import com.edus.annotation.LogOperation;
+import com.edus.aop.annotation.LogOperation;
+import com.edus.common.utils.Result;
 import com.edus.common.utils.UserContext;
 import com.edus.common.utils.WebUtils;
 import com.edus.entity.OperationLog;
@@ -21,6 +22,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Map;
 
 /**
  * 操作日志切面
@@ -34,7 +36,7 @@ public class OperationLogAspect {
 
     private final OperationLogService operationLogService;
 
-    @Pointcut("@annotation(com.edus.annotation.LogOperation)")
+    @Pointcut("@annotation(com.edus.aop.annotation.LogOperation)")
     public void operationLogPointcut() {}
 
     @Around("operationLogPointcut()")
@@ -68,6 +70,7 @@ public class OperationLogAspect {
                 // 设置用户信息
                 operationLog.setUserId(UserContext.getCurrentUserId());
                 operationLog.setUsername(UserContext.getCurrentUserName());
+                fillLoginAttemptUsername(operationLog, annotation, joinPoint.getArgs());
 
                 // 记录请求参数
                 if (annotation.logParams()) {
@@ -96,6 +99,8 @@ public class OperationLogAspect {
                 }
             }
 
+            fillLoginUserInfo(operationLog, annotation, result);
+
             operationLog.setStatus(1);
             return result;
 
@@ -113,6 +118,60 @@ public class OperationLogAspect {
                 operationLogService.saveAsync(operationLog);
             } catch (Exception e) {
                 log.error("操作日志保存失败", e);
+            }
+        }
+    }
+
+    /**
+     * 登录接口执行前通常没有UserContext，登录成功后从响应data中补充用户信息。
+     */
+    private void fillLoginUserInfo(OperationLog operationLog, LogOperation annotation, Object result) {
+        if (annotation == null || !"LOGIN".equalsIgnoreCase(annotation.operationType())) {
+            return;
+        }
+        if (operationLog.getUserId() != null && StrUtil.isNotBlank(operationLog.getUsername())) {
+            return;
+        }
+        if (!(result instanceof Result<?> response) || response.getCode() == null || response.getCode() != 200) {
+            return;
+        }
+        if (!(response.getData() instanceof Map<?, ?> data)) {
+            return;
+        }
+
+        Object userId = data.get("userId");
+        Object username = data.get("username");
+
+        if (operationLog.getUserId() == null && userId != null) {
+            try {
+                operationLog.setUserId(Long.parseLong(String.valueOf(userId)));
+            } catch (NumberFormatException e) {
+                log.debug("登录日志userId转换失败：{}", userId);
+            }
+        }
+        if (StrUtil.isBlank(operationLog.getUsername()) && username != null) {
+            operationLog.setUsername(String.valueOf(username));
+        }
+    }
+
+    /**
+     * 登录失败时也记录尝试登录的账号，但不记录密码。
+     */
+    private void fillLoginAttemptUsername(OperationLog operationLog, LogOperation annotation, Object[] args) {
+        if (annotation == null || !"LOGIN".equalsIgnoreCase(annotation.operationType())) {
+            return;
+        }
+        if (StrUtil.isNotBlank(operationLog.getUsername()) || args == null) {
+            return;
+        }
+
+        for (Object arg : args) {
+            if (arg instanceof Map<?, ?> data) {
+                Object username = data.get("username");
+                if (username != null && StrUtil.isNotBlank(String.valueOf(username))) {
+                    operationLog.setUsername(String.valueOf(username));
+                    return;
+                }
             }
         }
     }

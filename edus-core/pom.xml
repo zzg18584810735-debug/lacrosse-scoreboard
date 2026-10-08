@@ -29,6 +29,13 @@
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
 
+    <!-- Jakarta Servlet API (HttpServletRequest/HttpServletResponse) -->
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
     <!-- Spring Boot Validation -->
     <dependency>
       <groupId>org.springframework.boot</groupId>

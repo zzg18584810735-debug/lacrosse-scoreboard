@@ -23,21 +23,20 @@ spring:
           max-active: 15                 # 测试环境Redis连接池
           max-idle: 8
           min-idle: 1
-
+log:
+  path: /data/test/logs
+  file:
+    name: edus-test
 edus:
   # 签名配置 - 测试环境
   sign:
-    enabled: ${EDUS_SIGN_ENABLED:true}
-    app-id: ${EDUS_SIGN_APP_ID:edus-test-open-api}
-    secret: ${EDUS_SIGN_SECRET:edus-test-sign-secret}
-    timestamp-expire-seconds: ${EDUS_SIGN_EXPIRE_SECONDS:300}
-
-  # 异步任务配置 - 测试环境
-  async:
-    timeout-warning-millis: ${EDUS_ASYNC_TIMEOUT_WARNING_MILLIS:30000}
+    enabled: true
+    app-id: edus-test-open-api
+    secret: edus-test-sign-secret
+    timestamp-expire-seconds: 300
 
   # 监控接口保护 - 测试环境
   monitor:
-    access-token: ${EDUS_MONITOR_ACCESS_TOKEN:}
+    access-token: edus-test-monitor-token
     allow-dev-profile: true
     allow-internal-network: true

@@ -1,6 +1,6 @@
-package com.edus.aspect;
+package com.edus.aop.aspect;
 
-import com.edus.annotation.RateLimiter;
+import com.edus.aop.annotation.RateLimiter;
 import com.edus.common.exception.BusinessException;
 import com.edus.common.enums.StatusCode;
 import com.edus.common.utils.UserContext;

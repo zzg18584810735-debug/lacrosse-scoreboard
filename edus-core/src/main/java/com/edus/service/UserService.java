@@ -1,6 +1,8 @@
 package com.edus.service;
 
+import cn.hutool.core.lang.Console;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.digest.BCrypt;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
@@ -25,6 +27,10 @@ public class UserService extends ServiceImpl<UserMapper, User> {
     private final UserMapper userMapper;
 
     public User createUser(User user) {
+        if (StrUtil.hasBlank(user.getUsername(), user.getPassword())) {
+            throw BusinessException.validationError("用户名和密码不能为空");
+        }
+
         LambdaQueryWrapper<User> usernameWrapper = new LambdaQueryWrapper<>();
         usernameWrapper.eq(User::getUsername, user.getUsername());
         if (userMapper.selectCount(usernameWrapper) > 0) {
@@ -36,9 +42,14 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         if (userMapper.selectCount(emailWrapper) > 0) {
             throw BusinessException.dataAlreadyExists();
         }
+        Console.log(BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()));
+        user.setPassword(BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()));
+        if (StrUtil.isBlank(user.getStatus())) {
+            user.setStatus("ACTIVE");
+        }
 
         userMapper.insert(user);
-        return user;
+        return hidePassword(user);
     }
 
     @Transactional(readOnly = true)
@@ -47,11 +58,16 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         if (user == null) {
             throw BusinessException.userNotFound();
         }
-        return user;
+        return hidePassword(user);
     }
 
     @Transactional(readOnly = true)
     public User getUserByUsername(String username) {
+        return hidePassword(getUserByUsernameForAuth(username));
+    }
+
+    @Transactional(readOnly = true)
+    public User getUserByUsernameForAuth(String username) {
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(User::getUsername, username);
         User user = userMapper.selectOne(wrapper);
@@ -74,6 +90,7 @@ public class UserService extends ServiceImpl<UserMapper, User> {
 
         // 执行查询并返回
         userMapper.selectPage(page, wrapper);
+        page.getRecords().forEach(this::hidePassword);
         return new PageUtils(page);
     }
 
@@ -111,7 +128,7 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         user.setStatus(userDetails.getStatus());
 
         userMapper.updateById(user);
-        return user;
+        return hidePassword(user);
     }
 
     public void deleteUser(Long id) {
@@ -120,5 +137,12 @@ public class UserService extends ServiceImpl<UserMapper, User> {
             throw BusinessException.userNotFound();
         }
         userMapper.deleteById(id);
+    }
+
+    private User hidePassword(User user) {
+        if (user != null) {
+            user.setPassword(null);
+        }
+        return user;
     }
 }

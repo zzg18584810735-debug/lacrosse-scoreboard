@@ -33,9 +33,9 @@ spring:
           max-wait: -1
 
 server:
-  port: ${SERVER_PORT:8080}
+  port: 8080
   servlet:
-    context-path: ${SERVER_CONTEXT_PATH:/api}
+    context-path: /api
 
 mybatis-plus:
   mapper-locations: classpath:mapper/**/*.xml
@@ -75,10 +75,10 @@ edus:
 
   # 异步任务通用配置，各环境可按需覆盖
   async:
-    timeout-warning-millis: ${EDUS_ASYNC_TIMEOUT_WARNING_MILLIS:30000}
+    timeout-warning-millis: 30000
 
   # 监控接口通用安全基线，各环境在 profile 中明确覆盖
   monitor:
-    access-token: ${EDUS_MONITOR_ACCESS_TOKEN:} # 请求头：X-Monitor-Token
+    access-token: "" # 请求头：X-Monitor-Token，各环境在 profile 中明确配置
     allow-dev-profile: false
     allow-internal-network: true

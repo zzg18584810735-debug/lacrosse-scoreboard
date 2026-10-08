@@ -23,21 +23,20 @@ spring:
           max-active: 50                 # 生产环境Redis连接池
           max-idle: 20
           min-idle: 5
-
+log:
+  path: /data/prod/logs
+  file:
+    name: edus-prod
 edus:
   # 签名配置 - 生产环境
   sign:
-    enabled: ${EDUS_SIGN_ENABLED:true}
-    app-id: ${EDUS_SIGN_APP_ID:edus-prod-open-api}
-    secret: ${EDUS_SIGN_SECRET:change-me-prod-sign-secret}
-    timestamp-expire-seconds: ${EDUS_SIGN_EXPIRE_SECONDS:300}
-
-  # 异步任务配置 - 生产环境
-  async:
-    timeout-warning-millis: ${EDUS_ASYNC_TIMEOUT_WARNING_MILLIS:30000}
+    enabled: true
+    app-id: edus-prod-open-api
+    secret: change-me-prod-sign-secret
+    timestamp-expire-seconds: 300
 
   # 监控接口保护 - 生产环境
   monitor:
-    access-token: ${EDUS_MONITOR_ACCESS_TOKEN:}
+    access-token: change-me-monitor-token
     allow-dev-profile: false
-    allow-internal-network: ${EDUS_MONITOR_ALLOW_INTERNAL_NETWORK:true}
+    allow-internal-network: true
