@@ -2,14 +2,13 @@ package com.edus.common.components;
 
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 /**
  * 缓存管理器
@@ -21,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class CacheManager {
 
-    private final StringRedisTemplate redisTemplate;
+    private final RedisClient redisClient;
 
     // 缓存key前缀
     private static final String CACHE_PREFIX = "cache:";
@@ -32,8 +31,8 @@ public class CacheManager {
     // 不过期的标记
     private static final long NO_EXPIRE = -1;
 
-    public CacheManager(StringRedisTemplate redisTemplate) {
-        this.redisTemplate = redisTemplate;
+    public CacheManager(RedisClient redisClient) {
+        this.redisClient = redisClient;
     }
 
     // ==================== 字符串操作 ====================
@@ -59,9 +58,9 @@ public class CacheManager {
         String fullKey = buildKey(key);
         try {
             if (expireTimeSeconds == NO_EXPIRE) {
-                redisTemplate.opsForValue().set(fullKey, value);
+                redisClient.set(fullKey, value);
             } else {
-                redisTemplate.opsForValue().set(fullKey, value, expireTimeSeconds, TimeUnit.SECONDS);
+                redisClient.set(fullKey, value, Duration.ofSeconds(expireTimeSeconds));
             }
             log.debug("缓存设置成功：key={}, expireTime={}秒", fullKey, expireTimeSeconds);
         } catch (Exception e) {
@@ -78,7 +77,7 @@ public class CacheManager {
     public String get(String key) {
         String fullKey = buildKey(key);
         try {
-            String value = redisTemplate.opsForValue().get(fullKey);
+            String value = redisClient.get(fullKey);
             log.debug("缓存获取：key={}, exists={}", fullKey, value != null);
             return value;
         } catch (Exception e) {
@@ -98,9 +97,11 @@ public class CacheManager {
     public boolean setIfAbsent(String key, String value, long expireTimeSeconds) {
         String fullKey = buildKey(key);
         try {
-            Boolean result = redisTemplate.opsForValue().setIfAbsent(fullKey, value, expireTimeSeconds, TimeUnit.SECONDS);
+            boolean result = expireTimeSeconds == NO_EXPIRE
+                    ? redisClient.setIfAbsent(fullKey, value)
+                    : redisClient.setIfAbsent(fullKey, value, Duration.ofSeconds(expireTimeSeconds));
             log.debug("原子性设置缓存：key={}, success={}", fullKey, result);
-            return result != null && result;
+            return result;
         } catch (Exception e) {
             log.error("原子性设置缓存失败：key={}", fullKey, e);
             return false;
@@ -127,9 +128,9 @@ public class CacheManager {
     public boolean delete(String key) {
         String fullKey = buildKey(key);
         try {
-            Boolean result = redisTemplate.delete(fullKey);
+            boolean result = redisClient.delete(fullKey);
             log.debug("缓存删除：key={}, success={}", fullKey, result);
-            return result != null && result;
+            return result;
         } catch (Exception e) {
             log.error("缓存删除失败：key={}", fullKey, e);
             return false;
@@ -152,9 +153,9 @@ public class CacheManager {
                 .toList();
 
         try {
-            Long count = redisTemplate.delete(fullKeys);
+            long count = redisClient.delete(fullKeys);
             log.debug("批量删除缓存：count={}", count);
-            return count != null ? count : 0;
+            return count;
         } catch (Exception e) {
             log.error("批量删除缓存失败", e);
             return 0;
@@ -170,8 +171,7 @@ public class CacheManager {
     public boolean exists(String key) {
         String fullKey = buildKey(key);
         try {
-            Boolean result = redisTemplate.hasKey(fullKey);
-            return result != null && result;
+            return redisClient.hasKey(fullKey);
         } catch (Exception e) {
             log.error("检查缓存存在性失败：key={}", fullKey, e);
             return false;
@@ -188,8 +188,7 @@ public class CacheManager {
     public boolean expire(String key, long expireTimeSeconds) {
         String fullKey = buildKey(key);
         try {
-            Boolean result = redisTemplate.expire(fullKey, expireTimeSeconds, TimeUnit.SECONDS);
-            return result != null && result;
+            return redisClient.expire(fullKey, Duration.ofSeconds(expireTimeSeconds));
         } catch (Exception e) {
             log.error("设置过期时间失败：key={}", fullKey, e);
             return false;
@@ -205,8 +204,7 @@ public class CacheManager {
     public long getExpire(String key) {
         String fullKey = buildKey(key);
         try {
-            Long expire = redisTemplate.getExpire(fullKey, TimeUnit.SECONDS);
-            return expire != null ? expire : -2;
+            return redisClient.getExpireSeconds(fullKey);
         } catch (Exception e) {
             log.error("获取过期时间失败：key={}", fullKey, e);
             return -2;
@@ -237,7 +235,7 @@ public class CacheManager {
     public void hSet(String key, String field, String value, long expireTimeSeconds) {
         String fullKey = buildKey(key);
         try {
-            redisTemplate.opsForHash().put(fullKey, field, value);
+            redisClient.hashPut(fullKey, field, value);
             if (expireTimeSeconds != NO_EXPIRE) {
                 expire(fullKey, expireTimeSeconds);
             }
@@ -257,8 +255,7 @@ public class CacheManager {
     public String hGet(String key, String field) {
         String fullKey = buildKey(key);
         try {
-            Object value = redisTemplate.opsForHash().get(fullKey, field);
-            return value != null ? value.toString() : null;
+            return redisClient.hashGet(fullKey, field);
         } catch (Exception e) {
             log.error("Hash缓存获取失败：key={}, field={}", fullKey, field, e);
             return null;
@@ -275,7 +272,7 @@ public class CacheManager {
     public long hDelete(String key, Object... fields) {
         String fullKey = buildKey(key);
         try {
-            return redisTemplate.opsForHash().delete(fullKey, fields);
+            return redisClient.hashDelete(fullKey, java.util.Arrays.copyOf(fields, fields.length, String[].class));
         } catch (Exception e) {
             log.error("Hash字段删除失败：key={}", fullKey, e);
             return 0;
@@ -291,7 +288,7 @@ public class CacheManager {
     public Map<Object, Object> hGetAll(String key) {
         String fullKey = buildKey(key);
         try {
-            return redisTemplate.opsForHash().entries(fullKey);
+            return redisClient.hashEntries(fullKey);
         } catch (Exception e) {
             log.error("获取Hash失败：key={}", fullKey, e);
             return Map.of();
@@ -310,8 +307,7 @@ public class CacheManager {
     public long lPush(String key, String... values) {
         String fullKey = buildKey(key);
         try {
-            Long size = redisTemplate.opsForList().leftPushAll(fullKey, values);
-            return size != null ? size : 0;
+            return redisClient.leftPushAll(fullKey, values);
         } catch (Exception e) {
             log.error("List左侧添加失败：key={}", fullKey, e);
             return 0;
@@ -328,8 +324,7 @@ public class CacheManager {
     public long rPush(String key, String... values) {
         String fullKey = buildKey(key);
         try {
-            Long size = redisTemplate.opsForList().rightPushAll(fullKey, values);
-            return size != null ? size : 0;
+            return redisClient.rightPushAll(fullKey, values);
         } catch (Exception e) {
             log.error("List右侧添加失败：key={}", fullKey, e);
             return 0;
@@ -347,7 +342,7 @@ public class CacheManager {
     public List<String> lRange(String key, long start, long end) {
         String fullKey = buildKey(key);
         try {
-            return redisTemplate.opsForList().range(fullKey, start, end);
+            return redisClient.listRange(fullKey, start, end);
         } catch (Exception e) {
             log.error("获取List范围失败：key={}", fullKey, e);
             return List.of();
@@ -366,8 +361,7 @@ public class CacheManager {
     public long sAdd(String key, String... values) {
         String fullKey = buildKey(key);
         try {
-            Long count = redisTemplate.opsForSet().add(fullKey, values);
-            return count != null ? count : 0;
+            return redisClient.setAdd(fullKey, values);
         } catch (Exception e) {
             log.error("Set添加失败：key={}", fullKey, e);
             return 0;
@@ -383,7 +377,7 @@ public class CacheManager {
     public Set<String> sMembers(String key) {
         String fullKey = buildKey(key);
         try {
-            return redisTemplate.opsForSet().members(fullKey);
+            return redisClient.setMembers(fullKey);
         } catch (Exception e) {
             log.error("获取Set元素失败：key={}", fullKey, e);
             return Set.of();
@@ -400,8 +394,7 @@ public class CacheManager {
     public boolean sIsMember(String key, String value) {
         String fullKey = buildKey(key);
         try {
-            Boolean result = redisTemplate.opsForSet().isMember(fullKey, value);
-            return result != null && result;
+            return redisClient.setIsMember(fullKey, value);
         } catch (Exception e) {
             log.error("检查Set成员失败：key={}", fullKey, e);
             return false;
@@ -435,7 +428,7 @@ public class CacheManager {
     public Set<String> keys(String pattern) {
         try {
             String fullPattern = pattern.startsWith(CACHE_PREFIX) ? pattern : CACHE_PREFIX + pattern;
-            return redisTemplate.keys(fullPattern);
+            return redisClient.keys(fullPattern);
         } catch (Exception e) {
             log.error("模糊查询key失败：pattern={}", pattern, e);
             return Set.of();

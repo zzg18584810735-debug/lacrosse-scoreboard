@@ -28,15 +28,15 @@ log:
   file:
     name: edus-test
 edus:
-  # 签名配置 - 测试环境
+  # 签名配置 - 生产环境
   sign:
     enabled: true
-    app-id: edus-test-open-api
-    secret: edus-test-sign-secret
+    app-id: edus-prod-open-api
+    secret: change-me-sign-secret
     timestamp-expire-seconds: 300
 
   # 监控接口保护 - 测试环境
   monitor:
-    access-token: edus-test-monitor-token
-    allow-dev-profile: true
+    access-token: change-me-monitor-token
+    allow-dev-profile: false
     allow-internal-network: true

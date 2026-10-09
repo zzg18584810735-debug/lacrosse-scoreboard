@@ -3,37 +3,23 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.5.11</version>
-    <relativePath />
+    <groupId>com.edus</groupId>
+    <artifactId>edus-server</artifactId>
+    <version>1.0.0</version>
+    <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <groupId>com.edus</groupId>
   <artifactId>edus-core</artifactId>
-  <version>1.0.0</version>
   <packaging>jar</packaging>
 
   <name>edus-core</name>
   <description>Edus Core Application</description>
-
-  <properties>
-    <java.version>17</java.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
 
   <dependencies>
     <!-- Spring Boot Web -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
-    </dependency>
-
-    <!-- Jakarta Servlet API (HttpServletRequest/HttpServletResponse) -->
-    <dependency>
-      <groupId>jakarta.servlet</groupId>
-      <artifactId>jakarta.servlet-api</artifactId>
-      <scope>provided</scope>
     </dependency>
 
     <!-- Spring Boot Validation -->

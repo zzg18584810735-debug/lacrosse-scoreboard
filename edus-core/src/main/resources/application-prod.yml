@@ -5,7 +5,7 @@ spring:
   datasource:
     url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:edus_prod}?useUnicode=true&characterEncoding=utf8&useSSL=true&serverTimezone=UTC
     username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:prod_password}
+    password: ${DB_PASSWORD:123456}
     hikari:
       # 生产环境特定配置
       maximum-pool-size: 50              # 生产环境需要更多连接
@@ -16,7 +16,7 @@ spring:
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
-      password: ${REDIS_PASSWORD:prod_password}
+      password: ${REDIS_PASSWORD:}
       database: ${REDIS_DB:9}
       lettuce:
         pool:
@@ -32,7 +32,7 @@ edus:
   sign:
     enabled: true
     app-id: edus-prod-open-api
-    secret: change-me-prod-sign-secret
+    secret: change-me-sign-secret
     timestamp-expire-seconds: 300
 
   # 监控接口保护 - 生产环境

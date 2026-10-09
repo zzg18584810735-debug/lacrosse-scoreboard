@@ -25,15 +25,15 @@ spring:
           min-idle: 0
 
 edus:
-  # 签名配置 - 开发环境
+  # 签名配置 - 生产环境
   sign:
     enabled: true
-    app-id: jx-dev
-    secret: edus-dev-sign-secret
+    app-id: edus-prod-open-api
+    secret: change-me-sign-secret
     timestamp-expire-seconds: 300
 
   # 监控接口保护 - 开发环境
   monitor:
-    access-token: edus-dev-monitor-token
-    allow-dev-profile: true
+    access-token: change-me-monitor-token
+    allow-dev-profile: false
     allow-internal-network: true
