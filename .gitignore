@@ -20,9 +20,8 @@ target/
 **/target/
 !.mvn/wrapper/maven-wrapper.jar
 
-# Deployment build output
-deploy/app-score/back/*.jar
-deploy/app-score/frond/dist/
+# Deployment files
+deploy/
 
 # OS files
 .DS_Store
