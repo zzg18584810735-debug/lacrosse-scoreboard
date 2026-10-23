@@ -1,8 +1,7 @@
 # Environment files with secrets
 .env
 .env.*
-!.env.example
-!deploy/app-score/.env.test
+!/.env.local
 
 # Logs
 logs/
