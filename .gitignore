@@ -2,6 +2,7 @@
 .env
 .env.*
 !.env.example
+!deploy/app-score/.env.test
 
 # Logs
 logs/
@@ -17,6 +18,10 @@ logs/
 target/
 **/target/
 !.mvn/wrapper/maven-wrapper.jar
+
+# Deployment build output
+deploy/app-score/back/*.jar
+deploy/app-score/frond/dist/
 
 # OS files
 .DS_Store

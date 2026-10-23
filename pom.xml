@@ -11,12 +11,12 @@
     </parent>
 
     <groupId>com.edus</groupId>
-    <artifactId>edus-server</artifactId>
+    <artifactId>lacrosse-scoreboard</artifactId>
     <version>1.0.0</version>
     <packaging>pom</packaging>
 
-    <name>edus-server</name>
-    <description>Edus Server Parent Project</description>
+    <name>lacrosse-scoreboard</name>
+    <description>Lacrosse Scoreboard Parent Project</description>
 
     <modules>
         <module>edus-core</module>

@@ -7,7 +7,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 
 @EnableAsync
 @SpringBootApplication
-@MapperScan("com.edus.mapper")
+@MapperScan({"com.edus.auth.mapper", "com.edus.example.mapper", "com.edus.score.mapper"})
 public class EdusCoreApplication {
 
     public static void main(String[] args) {

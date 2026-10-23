@@ -7,24 +7,40 @@ import com.edus.common.utils.Result;
 import com.edus.common.utils.TokenUtil;
 import com.edus.common.utils.UserContext;
 import com.edus.common.utils.UserContext.UserDto;
-import com.edus.service.auth.SignatureService;
-import com.edus.service.auth.TokenService;
+import com.edus.auth.service.SignatureService;
+import com.edus.auth.service.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 @Component
-@RequiredArgsConstructor
 public class LoginInterceptor implements HandlerInterceptor {
 
     private final TokenService tokenService;
     private final SignatureService signatureService;
+    private final boolean scoreboardPermitAll;
+
+    public LoginInterceptor(TokenService tokenService, SignatureService signatureService,
+                            @Value("${edus.auth.scoreboard-permit-all:false}") boolean scoreboardPermitAll) {
+        this.tokenService = tokenService;
+        this.signatureService = signatureService;
+        this.scoreboardPermitAll = scoreboardPermitAll;
+    }
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         if ("OPTIONS".equals(request.getMethod())) {
+            return true;
+        }
+
+        String servletPath = request.getServletPath();
+        if (scoreboardPermitAll && ("/scoreboard".equals(servletPath)
+                || StrUtil.startWith(servletPath, "/scoreboard/"))) {
+            UserDto anonymous = new UserDto("0", "scoreboard-dev");
+            setUserContext(request, anonymous);
+            request.setAttribute("authType", "scoreboard-permit-all");
             return true;
         }
 

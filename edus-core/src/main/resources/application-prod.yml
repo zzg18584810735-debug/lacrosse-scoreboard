@@ -1,11 +1,8 @@
 # 生产环境配置
 
 spring:
-  # 数据库配置 - 生产环境
+  # 生产环境数据库连接池
   datasource:
-    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:edus_prod}?useUnicode=true&characterEncoding=utf8&useSSL=true&serverTimezone=UTC
-    username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:123456}
     hikari:
       # 生产环境特定配置
       maximum-pool-size: 50              # 生产环境需要更多连接
@@ -14,20 +11,19 @@ spring:
 
   data:
     redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
-      password: ${REDIS_PASSWORD:}
-      database: ${REDIS_DB:9}
       lettuce:
         pool:
           max-active: 50                 # 生产环境Redis连接池
           max-idle: 20
           min-idle: 5
 log:
-  path: /data/prod/logs
+  path: /data/score-prod/logs
   file:
     name: edus-prod
 edus:
+  auth:
+    scoreboard-permit-all: true
+
   # 签名配置 - 生产环境
   sign:
     enabled: true

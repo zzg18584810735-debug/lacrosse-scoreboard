@@ -1,0 +1,23 @@
+{
+  "name": "la-scoreboard-vue",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "node --test src/api/request.test.js src/adapters/matchDetailAdapter.test.js src/core/actionPolicy.test.js src/core/rules.test.js src/core/matchModel.test.js src/core/eventTypes.test.js src/core/timing.test.js src/core/matchEvents.test.js src/core/fieldActions.test.js src/core/periodActions.test.js src/core/correctionActions.test.js src/core/goalActions.test.js src/core/timeoutActions.test.js src/core/penaltyActions.test.js src/core/matchInfoActions.test.js src/core/scoreboardActions.test.js src/core/matchRecords.test.js src/core/matchOutcome.test.js src/core/matchRecovery.test.js src/storage/matchStorage.test.js src/storage/scoreboardPersistence.test.js src/stores/scoreboardStore.test.js src/composables/useTheme.test.js src/composables/useScoreboardRuntime.test.js src/composables/useScoreboardController.test.js src/utils/browser.test.js src/engine/scoreboardEngine.test.js src/components/scoreboard/matchHeader.test.js src/components/scoreboard/matchClockControls.test.js src/components/scoreboard/teamPanel.test.js src/components/scoreboard/fieldControls.test.js src/components/scoreboard/penaltyList.test.js src/components/scoreboard/recordList.test.js src/components/scoreboard/matchNavigation.test.js src/components/scoreboard/ruleView.test.js src/components/scoreboard/setupDialog.test.js src/components/scoreboard/matchInfoDialog.test.js src/components/scoreboard/goalDialog.test.js src/components/scoreboard/timeoutDialog.test.js src/components/scoreboard/penaltyDialog.test.js src/components/scoreboard/recordCorrectionDialog.test.js src/components/scoreboard/matchCorrectionDialog.test.js src/components/scoreboard/finalScoreDialog.test.js src/components/scoreboard/goldenGoalReviewDialog.test.js"
+  },
+  "dependencies": {
+    "pinia": "^4.1.0",
+    "vue": "^3.5.22"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.4",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.17",
+    "vite": "^5.4.21"
+  }
+}

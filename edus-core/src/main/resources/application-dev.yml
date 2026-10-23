@@ -1,11 +1,8 @@
 # 开发环境配置
 
 spring:
-  # 数据库配置 - 开发环境
+  # 开发环境数据库连接池
   datasource:
-    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:demo}?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC
-    username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:123456}
     hikari:
       # 开发环境特定配置
       maximum-pool-size: 10              # 开发环境连接池可以稍小
@@ -14,10 +11,6 @@ spring:
 
   data:
     redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
-      password: ${REDIS_PASSWORD:}
-      database: ${REDIS_DB:0}
       lettuce:
         pool:
           max-active: 8                  # 开发环境Redis连接池
@@ -25,6 +18,10 @@ spring:
           min-idle: 0
 
 edus:
+  # 开发阶段允许计分器接口免登录，后续接入记分员登录码时关闭。
+  auth:
+    scoreboard-permit-all: true
+
   # 签名配置 - 生产环境
   sign:
     enabled: true
