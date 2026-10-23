@@ -10,6 +10,7 @@ logs/
 
 # IDE files
 .idea/
+.codebuddy/
 .vscode/
 *.iml
 *.ipr
